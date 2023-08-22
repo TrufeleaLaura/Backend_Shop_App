@@ -1,7 +1,6 @@
 import { Request, Response } from 'express';
 import CartModel from "../model/cart.js";
-import product from "../model/product.js";
-import {CartItem, Product} from "../model/interfaces.js";
+import {CartItem} from "../model/interfaces.js";
 import ProductModel from "../model/product.js";
 
 export const getCartByUserId = async (req: Request, res: Response) => {
@@ -14,7 +13,7 @@ export const getCartByUserId = async (req: Request, res: Response) => {
         res.status(200).json(cart);
     } catch (error) {
         console.error('Error fetching cart by userId:', error);
-        res.status(500).json({ error: 'Error fetching cart by userId' });
+        res.status(404).json({ error: 'Error fetching cart by userId' });
     }
 };
 
@@ -67,7 +66,7 @@ export const updateCartItem = async (req: Request, res: Response) => {
         res.status(200).json(cart);
     } catch (error) {
         console.error('Error updating cart item:', error);
-        res.status(500).json({ error: 'Error updating cart item' });
+        res.status(404).json({ error: 'Error updating cart item' });
     }
 }
 
@@ -91,6 +90,6 @@ export const deleteCartItem = async (req: Request, res: Response) => {
         res.status(200).json(cart);
     } catch (error) {
         console.error('Error deleting cart item:', error);
-        res.status(500).json({ error: 'Error deleting cart item' });
+        res.status(404).json({ error: 'Error deleting cart item' });
     }
 }
