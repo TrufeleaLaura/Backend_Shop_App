@@ -28,10 +28,18 @@ export const getFilterProducts = async (req, res) => {
         const selectedCategories = req.body.categories;
         const nextProductsNumber = req.body.nextProductsNumber;
         const skip = req.body.productsInPage;
-        const products = await ProductModel.find({ category: { $in: selectedCategories } })
-            .skip(skip)
-            .limit(nextProductsNumber);
-        res.status(200).json(products);
+        if (selectedCategories.length === 0) {
+            const products = await ProductModel.find()
+                .skip(skip)
+                .limit(nextProductsNumber);
+            res.status(200).json(products);
+        }
+        else {
+            const products = await ProductModel.find({ category: { $in: selectedCategories } })
+                .skip(skip)
+                .limit(nextProductsNumber);
+            res.status(200).json(products);
+        }
     }
     catch (error) {
         console.error('Error retrieving products:', error);

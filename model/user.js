@@ -5,10 +5,11 @@ const userSchema = new Schema({
     lastName: { type: String, required: true },
     email: { type: String, required: true, unique: true },
     password: { type: String, required: true },
-    address: { type: String, required: true },
+    address: String,
     phoneNumber: { type: String, required: true },
     gender: { type: String, required: true },
     birthDate: { type: String, required: true },
+    token: String,
 });
 const UserModel = mongoose.model('user', userSchema);
 export default UserModel;
