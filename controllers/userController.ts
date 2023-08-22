@@ -3,6 +3,7 @@ import UserModel from "../model/user.js";
 import * as bcrypt from "bcrypt"
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
+import {createCartForUser} from "../service/cartService.js";
 dotenv.config();
 
 export const getUserById = async (req: Request, res: Response) => {
@@ -28,10 +29,8 @@ export const register = async (req: Request, res: Response) => {
         const oldUser=await UserModel.findOne({email});
         if(oldUser)
             return res.status(404).json({ error: 'User already exists' });
-        const id=await UserModel.find().countDocuments()+1;
         const encryptedPassword = await bcrypt.hash(password, 10);
         const newUser = await UserModel.create({
-            id: id,
             firstName,
             lastName,
             email,
@@ -41,10 +40,11 @@ export const register = async (req: Request, res: Response) => {
             birthDate,
             address:"",
         });
+        await createCartForUser(newUser._id.toString());
         res.status(200).json(newUser);
     } catch (error) {
         console.error('Error registering user:', error);
-        res.status(404).json({ error: 'Error registering user' });
+        res.status(500).json({ error: 'Error registering user' });
     }
 }
 
@@ -65,33 +65,16 @@ export const login = async (req: Request, res: Response) => {
             );
             user.token = token;
             await user.save();
-            return res.status(200).json(user);
+            res.header('Access-Control-Allow-Origin', 'http://localhost:3000');
+            return res.status(200).json({ user: user });
         }
     } catch (error) {
         console.error('Error logging in user:', error);
-        res.status(404).json({error: 'Error logging in user'});
+        res.status(500).json({error: 'Error logging in user'});
     }
 }
 
-export const protectedRoute=async (req: Request, res: Response) => {
-    try {
-        const token = req.headers.authorization?.split(' ')[1];
-        console.log(token)
-        if(!token)
-            return res.status(401).json({ error: 'Invalid token' });
-        const mysecretkey = "namaste";
-        const decoded = jwt.verify(token, mysecretkey);
-        const userEmail= decoded as { email: string };
-         const user=await UserModel.findOne({email:userEmail.email});
-        if (user) {
-            res.json({ message: `Welcome ${user.firstName}! This is a protected route.` });
-        } else {
-            res.status(401).json({ error: 'Invalid token' });
-        }
-    } catch (error) {
-        res.status(401).json({ error: 'Invalid token' });
-    }
-}
+
 export const logout = async (req: Request, res: Response) => {
     try {
         const token = req.headers.authorization?.split(' ')[1];
@@ -107,7 +90,7 @@ export const logout = async (req: Request, res: Response) => {
                 {email: user.email},
                 "namaste",
                 {
-                    expiresIn: "10s",
+                    expiresIn: "5s",
                 }
             );
             const updateUser = await UserModel.findOneAndUpdate(
@@ -120,9 +103,27 @@ export const logout = async (req: Request, res: Response) => {
         (error)
         {
             console.error('Error logging out user:', error);
-            res.status(404).json({error: 'Error logging out user'});
+            res.status(500).json({error: 'Error logging out user'});
         }
     }
 
-
+export const protectedRoute=async (req: Request, res: Response) => {
+    try {
+        const token = req.headers.authorization?.split(' ')[1];
+        console.log(token)
+        if(!token)
+            return res.status(401).json({ error: 'Invalid token' });
+        const mysecretkey = "namaste";
+        const decoded = jwt.verify(token, mysecretkey);
+        const userEmail= decoded as { email: string };
+        const user=await UserModel.findOne({email:userEmail.email});
+        if (user) {
+            res.json({ message: `Welcome ${user.firstName}! This is a protected route.` });
+        } else {
+            res.status(401).json({ error: 'Invalid token' });
+        }
+    } catch (error) {
+        res.status(401).json({ error: 'Invalid token' });
+    }
+}
 

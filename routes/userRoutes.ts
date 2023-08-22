@@ -3,7 +3,6 @@ import {getUserById, login, logout, protectedRoute, register} from "../controlle
 
 const router=express.Router();
 
-//router.route('/:userId').get(getUserById);
 router.route('/register').post(register);
 router.route('/login').post(login);
 router.route('/protected').get(protectedRoute);

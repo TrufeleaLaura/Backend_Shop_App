@@ -2,6 +2,7 @@ import UserModel from "../model/user.js";
 import * as bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
+import { createCartForUser } from "../service/cartService.js";
 dotenv.config();
 export const getUserById = async (req, res) => {
     try {
@@ -25,10 +26,8 @@ export const register = async (req, res) => {
         const oldUser = await UserModel.findOne({ email });
         if (oldUser)
             return res.status(404).json({ error: 'User already exists' });
-        const id = await UserModel.find().countDocuments() + 1;
         const encryptedPassword = await bcrypt.hash(password, 10);
         const newUser = await UserModel.create({
-            id: id,
             firstName,
             lastName,
             email,
@@ -38,11 +37,12 @@ export const register = async (req, res) => {
             birthDate,
             address: "",
         });
+        await createCartForUser(newUser._id.toString());
         res.status(200).json(newUser);
     }
     catch (error) {
         console.error('Error registering user:', error);
-        res.status(404).json({ error: 'Error registering user' });
+        res.status(500).json({ error: 'Error registering user' });
     }
 };
 export const login = async (req, res) => {
@@ -57,12 +57,37 @@ export const login = async (req, res) => {
             });
             user.token = token;
             await user.save();
-            return res.status(200).json(user);
+            res.header('Access-Control-Allow-Origin', 'http://localhost:3000');
+            return res.status(200).json({ user: user });
         }
     }
     catch (error) {
         console.error('Error logging in user:', error);
-        res.status(404).json({ error: 'Error logging in user' });
+        res.status(500).json({ error: 'Error logging in user' });
+    }
+};
+export const logout = async (req, res) => {
+    var _a;
+    try {
+        const token = (_a = req.headers.authorization) === null || _a === void 0 ? void 0 : _a.split(' ')[1];
+        console.log(token);
+        if (!token)
+            return res.status(401).json({ error: 'Invalid token' });
+        const mysecretkey = "namaste";
+        const decoded = jwt.verify(token, mysecretkey);
+        const userEmail = decoded;
+        const user = await UserModel.findOne({ email: userEmail.email });
+        if (user) {
+            const newToken = jwt.sign({ email: user.email }, "namaste", {
+                expiresIn: "5s",
+            });
+            const updateUser = await UserModel.findOneAndUpdate({ email: user.email }, { token: null });
+            return res.status(200).json({ message: 'Logged out successfully' });
+        }
+    }
+    catch (error) {
+        console.error('Error logging out user:', error);
+        res.status(500).json({ error: 'Error logging out user' });
     }
 };
 export const protectedRoute = async (req, res) => {
@@ -85,29 +110,5 @@ export const protectedRoute = async (req, res) => {
     }
     catch (error) {
         res.status(401).json({ error: 'Invalid token' });
-    }
-};
-export const logout = async (req, res) => {
-    var _a;
-    try {
-        const token = (_a = req.headers.authorization) === null || _a === void 0 ? void 0 : _a.split(' ')[1];
-        console.log(token);
-        if (!token)
-            return res.status(401).json({ error: 'Invalid token' });
-        const mysecretkey = "namaste";
-        const decoded = jwt.verify(token, mysecretkey);
-        const userEmail = decoded;
-        const user = await UserModel.findOne({ email: userEmail.email });
-        if (user) {
-            const newToken = jwt.sign({ email: user.email }, "namaste", {
-                expiresIn: "10s",
-            });
-            const updateUser = await UserModel.findOneAndUpdate({ email: user.email }, { token: null });
-            return res.status(200).json({ message: 'Logged out successfully' });
-        }
-    }
-    catch (error) {
-        console.error('Error logging out user:', error);
-        res.status(404).json({ error: 'Error logging out user' });
     }
 };

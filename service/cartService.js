@@ -1,13 +1,11 @@
-import CartModel, {Cart, CartItem} from "../model/cart.js";
-
-
-export const createCartForUser = async (userId: String) => {
+import CartModel from "../model/cart.js";
+export const createCartForUser = async (userId) => {
     try {
         const cartExists = await CartModel.findOne({ userId });
         if (cartExists) {
             return null;
         }
-        const newCart: Cart = {
+        const newCart = {
             userId: userId,
             total: 0,
             totalProducts: 0,
@@ -15,22 +13,21 @@ export const createCartForUser = async (userId: String) => {
             products: []
         };
         await CartModel.create(newCart);
-    } catch (error) {
+    }
+    catch (error) {
         console.error('Error creating cart:', error);
         return null;
     }
 };
-
-export const modifyCartItem = (cartItem: CartItem, quantity: number, cart: Cart) => {
+export const modifyCartItem = (cartItem, quantity, cart) => {
     cartItem.quantity += quantity;
     cartItem.total = cartItem.quantity * cartItem.price;
     cartItem.discountedPrice = cartItem.total * (1 - cartItem.discountPercentage / 100);
     cart.totalQuantity = cart.totalQuantity + quantity;
     cart.total = cart.products.reduce((total, item) => total + item.discountedPrice, 0);
-}
-
-export const addNewCartItem = (productToAddDoc:any, quantity: number, cart: Cart) => {
-    const newItem: CartItem = {
+};
+export const addNewCartItem = (productToAddDoc, quantity, cart) => {
+    const newItem = {
         productId: productToAddDoc.get('id'),
         quantity: 1,
         total: productToAddDoc.get('price'),
@@ -39,11 +36,9 @@ export const addNewCartItem = (productToAddDoc:any, quantity: number, cart: Cart
         thumbnail: productToAddDoc.get('thumbnail'),
         discountPercentage: productToAddDoc.get('discountPercentage'),
         discountedPrice: productToAddDoc.get('price') * (1 - productToAddDoc.get('discountPercentage') / 100),
-    }
+    };
     cart.totalQuantity += 1;
-    cart.totalProducts += 1
+    cart.totalProducts += 1;
     cart.total = cart.total + newItem.discountedPrice;
     cart.products.push(newItem);
-}
-
-
+};

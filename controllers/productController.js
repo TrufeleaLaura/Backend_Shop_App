@@ -6,7 +6,7 @@ const getAllProducts = async (req, res) => {
     }
     catch (error) {
         console.error('Error fetching products:', error);
-        res.status(404).json({ error: 'Error fetching products' });
+        res.status(400).json({ error: 'Error fetching products' });
     }
 };
 export const getProductById = async (req, res) => {
@@ -16,11 +16,12 @@ export const getProductById = async (req, res) => {
         if (!product) {
             return res.status(404).json({ error: 'Product not found' });
         }
+        res.header('Access-Control-Allow-Origin', 'http://localhost:3000');
         res.status(200).json(product);
     }
     catch (error) {
         console.error('Error fetching product:', error);
-        res.status(404).json({ error: 'Error fetching product' });
+        res.status(400).json({ error: 'Error fetching product' });
     }
 };
 export const getFilterProducts = async (req, res) => {
@@ -53,7 +54,7 @@ export const getAllCategories = async (req, res) => {
     }
     catch (error) {
         console.error('Error fetching categories:', error);
-        res.status(404).json({ error: 'Error fetching categories' });
+        res.status(400).json({ error: 'Error fetching categories' });
     }
 };
 export default getAllProducts;
