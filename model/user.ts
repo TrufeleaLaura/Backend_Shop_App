@@ -1,5 +1,16 @@
-import {User} from "./interfaces";
 import mongoose, {Schema} from "mongoose";
+
+export interface User{
+    id:number,
+    firstName:string,
+    lastName:string,
+    email:string,
+    password:string,
+    address:string,
+    phoneNumber:string,
+    gender:string,
+    birthDate:string,
+}
 
 const userSchema = new Schema<User>({
     id: { type: Number, required: true, unique: true },

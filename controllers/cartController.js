@@ -1,5 +1,28 @@
 import CartModel from "../model/cart.js";
 import ProductModel from "../model/product.js";
+export const createCart = async (req, res) => {
+    try {
+        const userId = req.params.userId;
+        const cart = await CartModel.findOne({ userId });
+        if (cart) {
+            return res.status(404).json({ error: 'Cart already exists' });
+        }
+        const newCart = ({
+            userId: Number(userId),
+            total: 0,
+            discountedTotal: 0,
+            totalProducts: 0,
+            totalQuantity: 0,
+            products: []
+        });
+        await CartModel.create(newCart);
+        res.status(200).json(newCart);
+    }
+    catch (error) {
+        console.error('Error creating cart:', error);
+        res.status(404).json({ error: 'Error creating cart' });
+    }
+};
 export const getCartByUserId = async (req, res) => {
     try {
         const userId = req.params.userId;
@@ -11,7 +34,7 @@ export const getCartByUserId = async (req, res) => {
     }
     catch (error) {
         console.error('Error fetching cart by userId:', error);
-        res.status(500).json({ error: 'Error fetching cart by userId' });
+        res.status(404).json({ error: 'Error fetching cart by userId' });
     }
 };
 export const updateCartItem = async (req, res) => {
@@ -64,7 +87,7 @@ export const updateCartItem = async (req, res) => {
     }
     catch (error) {
         console.error('Error updating cart item:', error);
-        res.status(500).json({ error: 'Error updating cart item' });
+        res.status(404).json({ error: 'Error updating cart item' });
     }
 };
 export const deleteCartItem = async (req, res) => {
@@ -88,6 +111,6 @@ export const deleteCartItem = async (req, res) => {
     }
     catch (error) {
         console.error('Error deleting cart item:', error);
-        res.status(500).json({ error: 'Error deleting cart item' });
+        res.status(404).json({ error: 'Error deleting cart item' });
     }
 };

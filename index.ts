@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 import express from "express";
-import connectDB from "./config/mongoConnection.js";
+import connectDB from "./config/DBConnection.js";
 import productsRoutes from "./routes/productRoutes.js";
 import cartRoutes from "./routes/cartRoutes.js";
 import userRoutes from "./routes/userRoutes.js";

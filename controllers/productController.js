@@ -6,7 +6,7 @@ const getAllProducts = async (req, res) => {
     }
     catch (error) {
         console.error('Error fetching products:', error);
-        res.status(500).json({ error: 'Error fetching products' });
+        res.status(404).json({ error: 'Error fetching products' });
     }
 };
 export default getAllProducts;

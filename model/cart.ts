@@ -1,6 +1,22 @@
 import mongoose, { Schema } from 'mongoose';
-import { Cart } from './interfaces.js';
-
+export interface CartItem{
+    productId: number;
+    quantity: number;
+    total: number;
+    price:number;
+    title:string;
+    thumbnail:string;
+    discountPercentage:number;
+    discountedPrice:number;
+}
+export interface Cart {
+    userId: number;
+    total:number;
+    discountedTotal:number;
+    totalProducts:number;
+    totalQuantity:number;
+    products: CartItem[];
+}
 
 const cartSchema = new Schema<Cart>({
     userId: { type: Number, required: true },

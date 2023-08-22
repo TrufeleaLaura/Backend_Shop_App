@@ -1,7 +1,30 @@
 import { Request, Response } from 'express';
-import CartModel from "../model/cart.js";
-import {CartItem} from "../model/interfaces.js";
+import CartModel, {Cart, CartItem} from "../model/cart.js";
+
 import ProductModel from "../model/product.js";
+
+export const createCart = async (req: Request, res: Response) => {
+    try {
+        const userId = req.params.userId;
+        const cart = await CartModel.findOne({ userId });
+        if (cart) {
+            return res.status(404).json({ error: 'Cart already exists' });
+        }
+        const newCart :Cart=({
+            userId: Number(userId),
+            total: 0,
+            discountedTotal: 0,
+            totalProducts: 0,
+            totalQuantity: 0,
+            products: []
+        });
+        await CartModel.create(newCart);
+        res.status(200).json(newCart);
+    } catch (error) {
+        console.error('Error creating cart:', error);
+        res.status(404).json({ error: 'Error creating cart' });
+    }
+}
 
 export const getCartByUserId = async (req: Request, res: Response) => {
     try {

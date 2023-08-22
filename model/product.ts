@@ -1,6 +1,18 @@
 import mongoose from 'mongoose';
 import {Schema } from 'mongoose';
-import { Product } from './interfaces';
+export interface Product {
+    id: number;
+    title: string;
+    description: string;
+    price: number;
+    discountPercentage: number;
+    rating: number;
+    stock: number;
+    brand: string;
+    category: string;
+    thumbnail: string;
+    images: string[];
+}
 
 const productSchema = new Schema<Product>({
     id: { type: Number, required: true, unique: true },
