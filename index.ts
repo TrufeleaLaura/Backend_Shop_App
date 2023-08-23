@@ -6,6 +6,9 @@ import cartRoutes from "./routes/cartRoutes.js";
 import userRoutes from "./routes/userRoutes.js";
 import cors from "cors";
 
+import dotenv from "dotenv";
+dotenv.config();
+
 connectDB()
 const app=express(),port=8080;
 

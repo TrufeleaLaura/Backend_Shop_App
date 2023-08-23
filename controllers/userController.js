@@ -1,13 +1,10 @@
 import UserModel from "../model/user.js";
 import * as bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
-import dotenv from "dotenv";
 import { createCartForUser } from "../service/cartService.js";
-dotenv.config();
 export const getUserById = async (req, res) => {
     try {
-        const userId = req.params.userId;
-        const user = await UserModel.findOne({ id: userId });
+        const userId = req.params.userId, user = await UserModel.findOne({ id: userId });
         if (!user) {
             return res.status(404).json({ error: 'User not found' });
         }
@@ -20,7 +17,7 @@ export const getUserById = async (req, res) => {
 };
 export const register = async (req, res) => {
     try {
-        const { firstName, lastName, email, password, phoneNumber, gender, birthDate } = req.body;
+        const { firstName, lastName, email, password, phoneNumber, gender, birthDate, address } = req.body;
         if (!(firstName && lastName && email && password && phoneNumber && gender && birthDate))
             return res.status(404).json({ error: 'Missing fields' });
         const oldUser = await UserModel.findOne({ email });
@@ -35,7 +32,7 @@ export const register = async (req, res) => {
             phoneNumber,
             gender,
             birthDate,
-            address: "",
+            address: address || null,
         });
         await createCartForUser(newUser._id.toString());
         res.status(200).json(newUser);
@@ -52,7 +49,7 @@ export const login = async (req, res) => {
             return res.status(404).json({ error: 'Missing fields' });
         const user = await UserModel.findOne({ email });
         if (user && (await bcrypt.compare(password, user.password))) {
-            const token = jwt.sign({ email: email }, "namaste", {
+            const token = jwt.sign({ email: email }, process.env.SECRET_CODE, {
                 expiresIn: "2h",
             });
             user.token = token;
@@ -73,12 +70,9 @@ export const logout = async (req, res) => {
         console.log(token);
         if (!token)
             return res.status(401).json({ error: 'Invalid token' });
-        const mysecretkey = "namaste";
-        const decoded = jwt.verify(token, mysecretkey);
-        const userEmail = decoded;
-        const user = await UserModel.findOne({ email: userEmail.email });
+        const mysecretkey = "namaste", decoded = jwt.verify(token, mysecretkey), userEmail = decoded, user = await UserModel.findOne({ email: userEmail.email });
         if (user) {
-            const newToken = jwt.sign({ email: user.email }, "namaste", {
+            const newToken = jwt.sign({ email: user.email }, process.env.SECRET_CODE, {
                 expiresIn: "5s",
             });
             const updateUser = await UserModel.findOneAndUpdate({ email: user.email }, { token: null });
@@ -97,10 +91,7 @@ export const protectedRoute = async (req, res) => {
         console.log(token);
         if (!token)
             return res.status(401).json({ error: 'Invalid token' });
-        const mysecretkey = "namaste";
-        const decoded = jwt.verify(token, mysecretkey);
-        const userEmail = decoded;
-        const user = await UserModel.findOne({ email: userEmail.email });
+        const mysecretkey = "namaste", decoded = jwt.verify(token, mysecretkey), userEmail = decoded, user = await UserModel.findOne({ email: userEmail.email });
         if (user) {
             res.json({ message: `Welcome ${user.firstName}! This is a protected route.` });
         }

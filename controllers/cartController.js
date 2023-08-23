@@ -3,8 +3,7 @@ import ProductModel from "../model/product.js";
 import { addNewCartItem, modifyCartItem } from "../service/cartService.js";
 export const getCartByUserId = async (req, res) => {
     try {
-        const userId = req.params.userId;
-        const cart = await CartModel.findOne({ userId });
+        const userId = req.params.userId, cart = await CartModel.findOne({ userId });
         if (!cart) {
             return res.status(404).json({ error: 'Cart not found' });
         }
@@ -17,13 +16,11 @@ export const getCartByUserId = async (req, res) => {
 };
 export const updateCartItem = async (req, res) => {
     try {
-        const userId = req.params.userId;
-        const cart = await CartModel.findOne({ userId });
+        const userId = req.params.userId, cart = await CartModel.findOne({ userId });
         if (!cart) {
             return res.status(404).json({ error: 'Cart not found' });
         }
-        const { productId, quantity } = req.body;
-        const cartItem = cart.products.find(item => item.productId === productId);
+        const { productId, quantity } = req.body, cartItem = cart.products.find(item => item.productId === productId);
         if (cartItem) {
             modifyCartItem(cartItem, quantity, cart);
         }
@@ -44,13 +41,11 @@ export const updateCartItem = async (req, res) => {
 };
 export const deleteCartItem = async (req, res) => {
     try {
-        const userId = req.params.userId;
-        const cart = await CartModel.findOne({ userId });
+        const userId = req.params.userId, cart = await CartModel.findOne({ userId });
         if (!cart) {
             return res.status(404).json({ error: 'Cart not found' });
         }
-        const productId = req.params.productId;
-        const cartItem = cart.products.find(item => item.productId === Number(productId));
+        const productId = req.params.productId, cartItem = cart.products.find(item => item.productId === Number(productId));
         if (!cartItem) {
             return res.status(404).json({ error: 'Cart item not found' });
         }
