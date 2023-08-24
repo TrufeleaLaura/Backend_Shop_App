@@ -1,3 +1,4 @@
+import CartModel from "../model/cart.js";
 import jsonwebtoken from "jsonwebtoken";
 import ProductModel from "../model/product.js";
 import { addNewCartItem, modifyCartItem } from "../service/cartService.js";
@@ -6,7 +7,11 @@ export const getCartByUserId = async (req, res) => {
     var _a;
     try {
         const token = (_a = req.headers.authorization) === null || _a === void 0 ? void 0 : _a.split(' ')[1], userId = req.params.userId;
-        const cart = await verifyTokenAndRetrieveCart(token, userId);
+        const user = await verifyTokenAndRetrieveCart(token, userId);
+        const cart = await CartModel.findOne({ userId: user._id });
+        if (!cart) {
+            throw new Error('Cart not found');
+        }
         res.status(200).json(cart);
     }
     catch (error) {
@@ -22,7 +27,11 @@ export const getCartByUserId = async (req, res) => {
 export const updateCartItem = async (req, res) => {
     var _a;
     try {
-        const token = (_a = req.headers.authorization) === null || _a === void 0 ? void 0 : _a.split(' ')[1], userId = req.params.userId, cart = await verifyTokenAndRetrieveCart(token, userId), { productId, quantity } = req.body, cartItem = cart.products.find(item => item.productId === productId);
+        const token = (_a = req.headers.authorization) === null || _a === void 0 ? void 0 : _a.split(' ')[1], userId = req.params.userId, user = await verifyTokenAndRetrieveCart(token, userId), { productId, quantity } = req.body, cart = await CartModel.findOne({ userId: user._id });
+        if (!cart) {
+            throw new Error('Cart not found');
+        }
+        const cartItem = cart.products.find(item => item.productId === productId);
         if (cartItem) {
             modifyCartItem(cartItem, quantity, cart);
         }
@@ -45,7 +54,11 @@ export const deleteCartItem = async (req, res) => {
     var _a;
     try {
         const token = (_a = req.headers.authorization) === null || _a === void 0 ? void 0 : _a.split(' ')[1], userId = req.params.userId;
-        const cart = await verifyTokenAndRetrieveCart(token, userId), productId = req.params.productId, cartItem = cart.products.find(item => item.productId === Number(productId));
+        const user = await verifyTokenAndRetrieveCart(token, userId), productId = req.params.productId, cart = await CartModel.findOne({ userId: user._id });
+        if (!cart) {
+            throw new Error('Cart not found');
+        }
+        const cartItem = cart === null || cart === void 0 ? void 0 : cart.products.find(item => item.productId === Number(productId));
         if (!cartItem) {
             return res.status(404).json({ error: 'Cart item not found' });
         }

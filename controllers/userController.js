@@ -1,7 +1,8 @@
 import UserModel from "../model/user.js";
 import * as bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
-import { createCartForUser } from "../service/cartService.js";
+import { createOrEmptyCartForUser } from "../service/cartService.js";
+import jsonwebtoken from "jsonwebtoken";
 export const getUserById = async (req, res) => {
     try {
         const userId = req.params.userId, user = await UserModel.findOne({ id: userId });
@@ -33,7 +34,7 @@ export const register = async (req, res) => {
             birthDate,
             address: address || null,
         });
-        await createCartForUser(newUser._id.toString());
+        await createOrEmptyCartForUser(newUser._id.toString());
         res.status(200).json(newUser);
     }
     catch (error) {
@@ -79,8 +80,13 @@ export const logout = async (req, res) => {
         }
     }
     catch (error) {
-        console.error('Error logging out user:', error);
-        res.status(500).json({ error: 'Error logging out user' });
+        if (error instanceof jsonwebtoken.JsonWebTokenError) {
+            res.status(401).json({ error: 'Invalid token' });
+        }
+        else {
+            console.error('Error logging out user:', error);
+            res.status(500).json({ error: 'Error logging out user' });
+        }
     }
 };
 // export const protectedRoute = async (req: Request, res: Response) => {

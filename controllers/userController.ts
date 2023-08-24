@@ -2,8 +2,9 @@ import {Request, Response} from 'express';
 import UserModel from "../model/user.js";
 import * as bcrypt from "bcrypt"
 import jwt from "jsonwebtoken";
-import {createCartForUser} from "../service/cartService.js";
+import {createOrEmptyCartForUser} from "../service/cartService.js";
 import verifyToken from "../service/userService.js";
+import jsonwebtoken from "jsonwebtoken";
 
 export const getUserById = async (req: Request, res: Response) => {
     try {
@@ -39,7 +40,7 @@ export const register = async (req: Request, res: Response) => {
                 birthDate,
                 address: address || null,
             });
-        await createCartForUser(newUser._id.toString());
+        await createOrEmptyCartForUser(newUser._id.toString());
         res.status(200).json(newUser);
     } catch (error) {
         console.error('Error registering user:', error);
@@ -98,10 +99,14 @@ export const logout = async (req: Request, res: Response) => {
             );
             return res.status(200).json({message: 'Logged out successfully'});
         }
-    } catch
-        (error) {
-        console.error('Error logging out user:', error);
-        res.status(500).json({error: 'Error logging out user'});
+    } catch (error: any) {
+        if (error instanceof jsonwebtoken.JsonWebTokenError) {
+            res.status(401).json({error: 'Invalid token'});
+        }
+        else {
+            console.error('Error logging out user:', error);
+            res.status(500).json({error: 'Error logging out user'});
+        }
     }
 }
 

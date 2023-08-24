@@ -5,6 +5,7 @@ const orderSchema = new Schema({
     paymentMethod: { type: String, required: true },
     address: { type: String, required: true },
     date: { type: String, required: true },
+    deliveryStatus: { type: String, required: true },
     products: [{
             productId: { type: Number, required: true },
             thumbnail: { type: String, required: true },

@@ -1,18 +1,24 @@
 import CartModel from "../model/cart.js";
-export const createCartForUser = async (userId) => {
+export const createOrEmptyCartForUser = async (userId) => {
     try {
         const cartExists = await CartModel.findOne({ userId });
         if (cartExists) {
-            return null;
+            cartExists.products = [];
+            cartExists.total = 0;
+            cartExists.totalProducts = 0;
+            cartExists.totalQuantity = 0;
+            await cartExists.save();
         }
-        const newCart = {
-            userId: userId,
-            total: 0,
-            totalProducts: 0,
-            totalQuantity: 0,
-            products: []
-        };
-        await CartModel.create(newCart);
+        else {
+            const newCart = {
+                userId: userId,
+                total: 0,
+                totalProducts: 0,
+                totalQuantity: 0,
+                products: []
+            };
+            await CartModel.create(newCart);
+        }
     }
     catch (error) {
         console.error('Error creating cart:', error);
