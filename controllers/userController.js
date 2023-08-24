@@ -22,9 +22,8 @@ export const register = async (req, res) => {
             return res.status(404).json({ error: 'Missing fields' });
         const oldUser = await UserModel.findOne({ email });
         if (oldUser)
-            return res.status(404).json({ error: 'User already exists' });
-        const encryptedPassword = await bcrypt.hash(password, 10);
-        const newUser = await UserModel.create({
+            return res.status(404).json('User already exists');
+        const encryptedPassword = await bcrypt.hash(password, 10), newUser = await UserModel.create({
             firstName,
             lastName,
             email,
@@ -84,22 +83,15 @@ export const logout = async (req, res) => {
         res.status(500).json({ error: 'Error logging out user' });
     }
 };
-export const protectedRoute = async (req, res) => {
-    var _a;
-    try {
-        const token = (_a = req.headers.authorization) === null || _a === void 0 ? void 0 : _a.split(' ')[1];
-        console.log(token);
-        if (!token)
-            return res.status(401).json({ error: 'Invalid token' });
-        const mysecretkey = "namaste", decoded = jwt.verify(token, mysecretkey), userEmail = decoded, user = await UserModel.findOne({ email: userEmail.email });
-        if (user) {
-            res.json({ message: `Welcome ${user.firstName}! This is a protected route.` });
-        }
-        else {
-            res.status(401).json({ error: 'Invalid token' });
-        }
-    }
-    catch (error) {
-        res.status(401).json({ error: 'Invalid token' });
-    }
-};
+// export const protectedRoute = async (req: Request, res: Response) => {
+//     try {
+//         const token = req.headers.authorization?.split(' ')[1];
+//         if (!token) {
+//             return res.status(401).json({error: 'Invalid token'});
+//         }
+//         //const user = await verifyToken(token);
+//         //res.json({ message: `Welcome ${user.firstName}! This is a protected route.` });
+//     } catch (error:any) {
+//         res.status(401).json({ error: error.message });
+//     }
+// }

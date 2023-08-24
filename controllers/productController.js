@@ -41,7 +41,6 @@ export const getFilterProducts = async (req, res) => {
             .skip(skip)
             .limit(limit);
         res.status(200).json(products);
-        // }
     }
     catch (error) {
         console.error('Error retrieving products:', error);

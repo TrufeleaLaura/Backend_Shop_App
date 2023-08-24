@@ -1,32 +1,35 @@
 import {Request, Response} from 'express';
-import CartModel, {Cart, CartItem} from "../model/cart.js";
-
+import CartModel from "../model/cart.js";
+import jsonwebtoken from "jsonwebtoken";
 import ProductModel from "../model/product.js";
 import {addNewCartItem, modifyCartItem} from "../service/cartService.js";
+import verifyToken from "../service/userService.js";
+import verifyTokenAndRetrieveCart from "../service/userService.js";
+import UserModel from "../model/user.js";
 
 
 export const getCartByUserId = async (req: Request, res: Response) => {
     try {
-        const userId = req.params.userId,
-            cart = await CartModel.findOne({userId});
-        if (!cart) {
-            return res.status(404).json({error: 'Cart not found'});
-        }
+        const token = req.headers.authorization?.split(' ')[1],
+            userId = req.params.userId;
+        const cart = await verifyTokenAndRetrieveCart(token,userId);
         res.status(200).json(cart);
-    } catch (error) {
-        console.error('Error fetching cart by userId:', error);
-        res.status(400).json({error: 'Error fetching cart by userId'});
+    } catch (error: any) {
+        if (error instanceof jsonwebtoken.JsonWebTokenError) {
+            res.status(401).json({error: 'Invalid token'});
+        } else {
+            console.error('Error fetching cart by userId:', error);
+            res.status(400).json({error: error.message});
+        }
     }
-};
+}
 
 export const updateCartItem = async (req: Request, res: Response) => {
     try {
-        const userId = req.params.userId,
-            cart = await CartModel.findOne({userId});
-        if (!cart) {
-            return res.status(404).json({error: 'Cart not found'});
-        }
-        const {productId, quantity} = req.body,
+        const token = req.headers.authorization?.split(' ')[1],
+            userId = req.params.userId,
+         cart = await verifyTokenAndRetrieveCart(token,userId),
+            {productId, quantity} = req.body,
             cartItem = cart.products.find(item => item.productId === productId);
         if (cartItem) {
             modifyCartItem(cartItem, quantity, cart);
@@ -39,21 +42,19 @@ export const updateCartItem = async (req: Request, res: Response) => {
         }
         await cart.save();
         res.status(200).json(cart);
-    } catch (error) {
+    } catch (error:any) {
         console.error('Error updating cart item:', error);
-        res.status(400).json({error: 'Error updating cart item'});
+        res.status(400).json({error: error.message});
     }
 }
 
 
 export const deleteCartItem = async (req: Request, res: Response) => {
     try {
-        const userId = req.params.userId,
-            cart = await CartModel.findOne({userId});
-        if (!cart) {
-            return res.status(404).json({error: 'Cart not found'});
-        }
-        const productId = req.params.productId,
+        const token = req.headers.authorization?.split(' ')[1],
+            userId = req.params.userId;
+        const cart = await verifyTokenAndRetrieveCart(token,userId),
+            productId = req.params.productId,
             cartItem = cart.products.find(item => item.productId === Number(productId));
         if (!cartItem) {
             return res.status(404).json({error: 'Cart item not found'});
@@ -63,9 +64,10 @@ export const deleteCartItem = async (req: Request, res: Response) => {
         cart.totalProducts = cart.products.length;
         cart.total = cart.products.reduce((total, item) => total + item.discountedPrice, 0);
         await cart.save();
-        res.status(200).json(cart);
+        return res.status(200).json(cart);
     } catch (error) {
         console.error('Error deleting cart item:', error);
-        res.status(404).json({error: 'Error deleting cart item'});
+        return res.status(500).json({error: 'Internal server error'});
     }
+
 }

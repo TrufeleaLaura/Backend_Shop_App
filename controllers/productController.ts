@@ -45,13 +45,12 @@ export const getAllProductsWithLimit = async (req: Request, res: Response) => {
 export const getFilterProducts = async (req: Request, res: Response) => {
     try {
         const selectedCategories = req.body.categories,
-           skip=req.body.skip,
-            limit= req.body.limit || 9,
-             products = await ProductModel.find({category: {$in: selectedCategories}})
+            skip = req.body.skip,
+            limit = req.body.limit || 9,
+            products = await ProductModel.find({category: {$in: selectedCategories}})
                 .skip(skip)
                 .limit(limit);
-            res.status(200).json(products);
-       // }
+        res.status(200).json(products);
     } catch (error) {
         console.error('Error retrieving products:', error);
         res.status(500).json({error: 'An error occurred while retrieving products'});
