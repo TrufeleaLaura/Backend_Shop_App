@@ -5,7 +5,13 @@ import {Request, Response} from "express";
 import CartModel from "../model/cart.js";
 import {createOrEmptyCartForUser} from "../service/cartService.js";
 
-
+/**
+ * The function returns the content of the order for a user, if the user is authenticated.
+ * @param req:Request, orderId: String
+ * @param res:Response, Order: Object
+ * @return {Object} Order
+ * * @throws {401} If the provided token is invalid.
+ */
 export const getOrderById = async (req: Request, res: Response) => {
     try {
         const orderId = req.params.orderId,
@@ -21,6 +27,14 @@ export const getOrderById = async (req: Request, res: Response) => {
     }
 }
 
+/**
+ * The function returns all the orders for a user, if the user is authenticated.
+ * @param req:Request, userId: String
+ * @param res:Response, Order: Object
+ * @return {Object} Order
+ * * @throws {401} If the provided token is invalid.
+ * * @throws {400} If there's an error while fetching the orders.
+ */
 export const getOrdersByUserId = async (req: Request, res: Response) => {
     try {
         const token = req.headers.authorization?.split(' ')[1],
@@ -37,7 +51,14 @@ export const getOrdersByUserId = async (req: Request, res: Response) => {
         }
     }
 }
-
+/**
+ * The function adds a new order for a user, if the user is authenticated.
+ * @param req:Request, userId: String, phoneNumber: String, fullName: String, products: Array, total: Number, paymentMethod: String, address: String
+ * @param res:Response, Cart: Object
+ * @return {Object} Cart
+ * * @throws {401} If the provided token is invalid.
+ * * @throws {400} If there's an error while adding the order.
+ */
 export const addOrder = async (req: Request, res: Response) => {
     try {
         const token = req.headers.authorization?.split(' ')[1],
@@ -57,7 +78,7 @@ export const addOrder = async (req: Request, res: Response) => {
         await OrderModel.create(newOrder);
         const cartToRefresh = await CartModel.findOne({userId: userId.trim()});
         if (!cartToRefresh) throw new Error('Cart not found');
-        const cart=await createOrEmptyCartForUser(userId);
+        const cart = await createOrEmptyCartForUser(userId);
         res.status(201).json(cart);
     } catch (error: any) {
         if (error instanceof jsonwebtoken.JsonWebTokenError) {

@@ -2,6 +2,13 @@ import {Request, Response} from 'express';
 import ProductModel from "../model/product.js";
 
 
+/**
+ * The function returns product from database
+ * @param req Request, productId: String
+ * @param res: Response, Product: Object
+ * @return {Object} Product
+ * @throws {400} If there's an error while fetching the product.
+ */
 export const getProductById = async (req: Request, res: Response) => {
     try {
         const productId = req.params.productId,
@@ -17,6 +24,13 @@ export const getProductById = async (req: Request, res: Response) => {
     }
 }
 
+/**
+ * The function returns all the categories from database
+ * @param req:Request
+ * @param res:Response, categories: Array
+ * @return {Array} categories
+ * @throws {400} If there's an error while fetching the categories.
+ */
 
 export const getAllCategories = async (req: Request, res: Response) => {
     try {
@@ -28,6 +42,13 @@ export const getAllCategories = async (req: Request, res: Response) => {
     }
 }
 
+/**
+ * the function returns all products skipping a certain number and bringing a certain number of products
+ * @param req:Request, limit: Number, skip: Number
+ * @param res:Response, products: Array
+ * @return {Array} products
+ * @throws {400} If there's an error while fetching the products.
+ */
 export const getAllProductsWithLimit = async (req: Request, res: Response) => {
     try {
         const limit = req.body.limit || 9,
@@ -42,6 +63,14 @@ export const getAllProductsWithLimit = async (req: Request, res: Response) => {
     }
 }
 
+/**
+ * the function returns all products that have the category in the given categories array,
+ * skipping a certain number and bringing a certain number of products
+ * @param req:Request, categories: Array, limit: Number, skip: Number
+ * @param res:Response, products: Array
+ * @return {Array} products
+ * @throws {400} If there's an error while fetching the products.
+ */
 export const getFilterProducts = async (req: Request, res: Response) => {
     try {
         const selectedCategories = req.body.categories,
@@ -57,6 +86,13 @@ export const getFilterProducts = async (req: Request, res: Response) => {
     }
 }
 
+/**
+ * the function returns all products that have the searchTerm in their title
+ * @param req:Request, searchTerm: String
+ * @param res:Response, products: Array
+ * @return {Array} products
+ * @throws {400} If there's an error while fetching the products.
+ */
 export const searchProducts = async (req: Request, res: Response) => {
     try {
         const searchTerm = req.params.searchTerm,

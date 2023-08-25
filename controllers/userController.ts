@@ -6,21 +6,14 @@ import {createOrEmptyCartForUser} from "../service/cartService.js";
 import verifyToken from "../service/userService.js";
 import jsonwebtoken from "jsonwebtoken";
 
-export const getUserById = async (req: Request, res: Response) => {
-    try {
-        const userId = req.params.userId,
-            user = await UserModel.findOne({id: userId});
-
-        if (!user) {
-            return res.status(404).json({error: 'User not found'});
-        }
-        return res.status(200).json(user);
-    } catch (error) {
-        console.error('Error fetching user:', error);
-        res.status(404).json({error: 'Error fetching user'});
-    }
-};
-
+/**
+ * The function registers a new user
+ * @param req : Request ,firstName:String, lastName:String, email:String, password:String, phoneNumber:String, gender:String,
+ * birthDate:String,address:String
+ * @param res: Response, User: Object
+ * @return {Object} User
+ * @throws {500} If there's an error while registering the user.
+ */
 export const register = async (req: Request, res: Response) => {
     try {
         const {firstName, lastName, email, password, phoneNumber, gender, birthDate, address} = req.body;
@@ -48,7 +41,13 @@ export const register = async (req: Request, res: Response) => {
     }
 }
 
-
+/**
+ * The function logs in a user
+ * @param req: Request, email:String, password:String
+ * @param res: Response, User: Object
+ * @return {Object} User
+ * @throws {500} If there's an error while logging in the user.
+ */
 export const login = async (req: Request, res: Response) => {
     try {
         const {email, password} = req.body;
@@ -74,7 +73,14 @@ export const login = async (req: Request, res: Response) => {
     }
 }
 
-
+/**
+ * The function logs out a user, if a user is authenticated.
+ * @param req: Request
+ * @param res: Response
+ * @return {Object} Message
+ * @throws {401} If the provided token is invalid.
+ * @throws {500} If there's an error while logging out the user.
+ */
 export const logout = async (req: Request, res: Response) => {
     try {
         const token = req.headers.authorization?.split(' ')[1];
@@ -102,8 +108,7 @@ export const logout = async (req: Request, res: Response) => {
     } catch (error: any) {
         if (error instanceof jsonwebtoken.JsonWebTokenError) {
             res.status(401).json({error: 'Invalid token'});
-        }
-        else {
+        } else {
             console.error('Error logging out user:', error);
             res.status(500).json({error: 'Error logging out user'});
         }

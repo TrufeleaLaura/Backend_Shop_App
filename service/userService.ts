@@ -2,7 +2,13 @@ import jwt from "jsonwebtoken";
 import UserModel from "../model/user.js";
 import CartModel from "../model/cart.js";
 
-
+/**
+ * The function verifies the token and retrieves the user.
+ * @param token: String
+ * @param userId: String
+ * @return {Object} User
+ * @throws {Error} If there's an error while verifying the token or retrieving the user.
+ */
 const verifyTokenAndRetrieveUser = async (token: any, userId: string) => {
     try {
         console.log('token', token)
