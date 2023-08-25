@@ -1,6 +1,6 @@
 import jwt from "jsonwebtoken";
 import UserModel from "../model/user.js";
-const verifyTokenAndRetrieveObject = async (token, userId) => {
+const verifyTokenAndRetrieveUser = async (token, userId) => {
     try {
         console.log('token', token);
         if (!token) {
@@ -20,4 +20,4 @@ const verifyTokenAndRetrieveObject = async (token, userId) => {
         throw error;
     }
 };
-export default verifyTokenAndRetrieveObject;
+export default verifyTokenAndRetrieveUser;

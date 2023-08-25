@@ -6,6 +6,8 @@ const orderSchema = new Schema({
     address: { type: String, required: true },
     date: { type: String, required: true },
     deliveryStatus: { type: String, required: true },
+    phoneNumber: { type: String, required: true },
+    fullName: { type: String, required: true },
     products: [{
             productId: { type: Number, required: true },
             thumbnail: { type: String, required: true },

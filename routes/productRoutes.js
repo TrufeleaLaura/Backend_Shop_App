@@ -1,9 +1,9 @@
 import express from "express";
-import getAllProducts, { getAllCategories, getAllProductsWithLimit, getFilterProducts, getProductById } from "../controllers/productController.js";
+import { getAllCategories, getAllProductsWithLimit, getFilterProducts, getProductById, searchProducts } from "../controllers/productController.js";
 const router = express.Router();
 router.route('/').post(getAllProductsWithLimit);
-router.route('/').get(getAllProducts);
 router.route('/filter').post(getFilterProducts);
 router.route('/categories').get(getAllCategories);
 router.route('/:productId').get(getProductById);
+router.route('/search/:searchTerm').get(searchProducts);
 export default router;

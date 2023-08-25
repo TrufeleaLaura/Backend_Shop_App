@@ -1,11 +1,9 @@
 import jsonwebtoken from "jsonwebtoken";
-import verifyTokenAndRetrieveObject from "../service/userService.js";
+import verifyTokenAndRetrieveUser from "../service/userService.js";
 import OrderModel, {Order} from "../model/order.js";
 import {Request, Response} from "express";
 import CartModel from "../model/cart.js";
 import {createOrEmptyCartForUser} from "../service/cartService.js";
-import mongoose, {Types} from "mongoose";
-import order from "../model/order.js";
 
 
 export const getOrderById = async (req: Request, res: Response) => {
@@ -26,15 +24,14 @@ export const getOrderById = async (req: Request, res: Response) => {
 export const getOrdersByUserId = async (req: Request, res: Response) => {
     try {
         const token = req.headers.authorization?.split(' ')[1],
-            userId = req.params.userId;
-        const user = await verifyTokenAndRetrieveObject(token, userId);
-        const orders = await OrderModel.find({userId: userId.trim()});
+            userId = req.params.userId,
+            user = await verifyTokenAndRetrieveUser(token, userId),
+            orders = await OrderModel.find({userId: userId.trim()});
         res.status(200).json(orders);
     } catch (error: any) {
         if (error instanceof jsonwebtoken.JsonWebTokenError) {
             res.status(401).json({error: 'Invalid token'});
-        }
-            else {
+        } else {
             console.error('Error fetching orders by userId:', error);
             res.status(400).json({error: error.message});
         }
@@ -45,21 +42,23 @@ export const addOrder = async (req: Request, res: Response) => {
     try {
         const token = req.headers.authorization?.split(' ')[1],
             userId = req.params.userId,
-            user = await verifyTokenAndRetrieveObject(token, req.params.userId),
+            user = await verifyTokenAndRetrieveUser(token, req.params.userId),
             newOrder: Order = {
                 userId: userId.trim(),
+                phoneNumber: req.body.phoneNumber,
+                fullName: req.body.fullName,
                 products: req.body.products,
                 total: req.body.total,
                 paymentMethod: req.body.paymentMethod,
                 address: req.body.address,
-                date: new Date().toISOString(),
+                date: new Date().toISOString().split('T')[0],
                 deliveryStatus: 'Pending'
             }
         await OrderModel.create(newOrder);
         const cartToRefresh = await CartModel.findOne({userId: userId.trim()});
         if (!cartToRefresh) throw new Error('Cart not found');
-        createOrEmptyCartForUser(userId);
-        res.status(201).json(newOrder);
+        const cart=await createOrEmptyCartForUser(userId);
+        res.status(201).json(cart);
     } catch (error: any) {
         if (error instanceof jsonwebtoken.JsonWebTokenError) {
             res.status(401).json({error: 'Invalid token'});

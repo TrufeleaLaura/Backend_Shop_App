@@ -1,5 +1,5 @@
 import jsonwebtoken from "jsonwebtoken";
-import verifyTokenAndRetrieveObject from "../service/userService.js";
+import verifyTokenAndRetrieveUser from "../service/userService.js";
 import OrderModel from "../model/order.js";
 import CartModel from "../model/cart.js";
 import { createOrEmptyCartForUser } from "../service/cartService.js";
@@ -21,9 +21,7 @@ export const getOrderById = async (req, res) => {
 export const getOrdersByUserId = async (req, res) => {
     var _a;
     try {
-        const token = (_a = req.headers.authorization) === null || _a === void 0 ? void 0 : _a.split(' ')[1], userId = req.params.userId;
-        const user = await verifyTokenAndRetrieveObject(token, userId);
-        const orders = await OrderModel.find({ userId: userId.trim() });
+        const token = (_a = req.headers.authorization) === null || _a === void 0 ? void 0 : _a.split(' ')[1], userId = req.params.userId, user = await verifyTokenAndRetrieveUser(token, userId), orders = await OrderModel.find({ userId: userId.trim() });
         res.status(200).json(orders);
     }
     catch (error) {
@@ -39,21 +37,23 @@ export const getOrdersByUserId = async (req, res) => {
 export const addOrder = async (req, res) => {
     var _a;
     try {
-        const token = (_a = req.headers.authorization) === null || _a === void 0 ? void 0 : _a.split(' ')[1], userId = req.params.userId, user = await verifyTokenAndRetrieveObject(token, req.params.userId), newOrder = {
-            userId: userId,
+        const token = (_a = req.headers.authorization) === null || _a === void 0 ? void 0 : _a.split(' ')[1], userId = req.params.userId, user = await verifyTokenAndRetrieveUser(token, req.params.userId), newOrder = {
+            userId: userId.trim(),
+            phoneNumber: req.body.phoneNumber,
+            fullName: req.body.fullName,
             products: req.body.products,
             total: req.body.total,
             paymentMethod: req.body.paymentMethod,
             address: req.body.address,
-            date: new Date().toISOString(),
+            date: new Date().toISOString().split('T')[0],
             deliveryStatus: 'Pending'
         };
         await OrderModel.create(newOrder);
         const cartToRefresh = await CartModel.findOne({ userId: userId.trim() });
         if (!cartToRefresh)
             throw new Error('Cart not found');
-        createOrEmptyCartForUser(userId);
-        res.status(201).json(newOrder);
+        const cart = await createOrEmptyCartForUser(userId);
+        res.status(201).json(cart);
     }
     catch (error) {
         if (error instanceof jsonwebtoken.JsonWebTokenError) {

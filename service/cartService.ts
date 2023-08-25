@@ -10,6 +10,7 @@ export const createOrEmptyCartForUser = async (userId: String) => {
             cartExists.totalProducts = 0;
             cartExists.totalQuantity = 0;
             await cartExists.save();
+            return cartExists;
         }
         else {
             const newCart: Cart = {

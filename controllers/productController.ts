@@ -57,6 +57,18 @@ export const getFilterProducts = async (req: Request, res: Response) => {
     }
 }
 
+export const searchProducts = async (req: Request, res: Response) => {
+    try {
+        const searchTerm = req.params.searchTerm,
+            products = await ProductModel.find({title: {$regex: searchTerm, $options: 'i'}});
+        res.status(200).json(products);
+    } catch (error) {
+        console.error('Error retrieving products:', error);
+        res.status(500).json({error: 'An error occurred while retrieving products'});
+    }
+};
+
+
 export default getProductById;
 
 

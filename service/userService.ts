@@ -3,7 +3,7 @@ import UserModel from "../model/user.js";
 import CartModel from "../model/cart.js";
 
 
-const verifyTokenAndRetrieveObject = async (token: any, userId: string) => {
+const verifyTokenAndRetrieveUser = async (token: any, userId: string) => {
     try {
         console.log('token', token)
         if (!token) {
@@ -21,11 +21,11 @@ const verifyTokenAndRetrieveObject = async (token: any, userId: string) => {
             throw new Error('Unauthorized access');
         }
         return user;
-    } catch (error:any) {
-            throw error;
+    } catch (error: any) {
+        throw error;
 
     }
 };
 
 
-export default verifyTokenAndRetrieveObject;
+export default verifyTokenAndRetrieveUser;
