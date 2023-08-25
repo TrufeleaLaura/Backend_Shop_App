@@ -89,7 +89,7 @@ export const logout = async (req: Request, res: Response) => {
         console.log(token)
         if (!token)
             return res.status(401).json({error: 'Invalid token'});
-        const mysecretkey = "namaste",
+        const mysecretkey = process.env.SECRET_CODE as string,
             decoded = jwt.verify(token, mysecretkey),
             userEmail = decoded as { email: string },
             user = await UserModel.findOne({email: userEmail.email});

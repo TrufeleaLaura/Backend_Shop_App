@@ -21,7 +21,7 @@ export const getCartByUserId = async (req: Request, res: Response) => {
             user = await verifyTokenAndRetrieveUser(token, userId),
             cart = await CartModel.findOne({userId: user._id});
         if (!cart) {
-            throw new Error('Cart not found');
+            return res.status(404).json({error: 'Cart not found'});
         }
         res.status(200).json(cart);
     } catch (error: any) {
@@ -50,7 +50,7 @@ export const updateCartItem = async (req: Request, res: Response) => {
             {productId, quantity} = req.body,
             cart = await CartModel.findOne({userId: user._id});
         if (!cart) {
-            throw new Error('Cart not found');
+            return res.status(404).json({error: 'Cart not found'});
         }
         const cartItem = cart.products.find(item => item.productId === productId);
         if (cartItem) {
@@ -90,7 +90,7 @@ export const deleteCartItem = async (req: Request, res: Response) => {
             productId = req.params.productId,
             cart = await CartModel.findOne({userId: user._id});
         if (!cart) {
-            throw new Error('Cart not found');
+            return res.status(404).json({error: 'Cart not found'});
         }
         const cartItem = cart?.products.find(item => item.productId === Number(productId));
         if (!cartItem) {

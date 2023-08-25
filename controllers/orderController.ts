@@ -80,7 +80,8 @@ export const addOrder = async (req: Request, res: Response) => {
             }
         await OrderModel.create(newOrder);
         const cartToRefresh = await CartModel.findOne({userId: userId.trim()});
-        if (!cartToRefresh) throw new Error('Cart not found');
+        if (!cartToRefresh)
+            return res.status(404).json({error: 'Cart not found'});
         const cart = await createOrEmptyCartForUser(userId);
         res.status(201).json(cart);
     } catch (error: any) {
