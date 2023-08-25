@@ -3,7 +3,7 @@ import {addOrder, getOrderById, getOrdersByUserId} from "../controllers/orderCon
 
 const router=express.Router();
 
-router.route('/:orderId').get(getOrderById);
+router.route('/order-id/:userId/:orderId').get(getOrderById);
 router.route('/all-orders/:userId').get(getOrdersByUserId);
 router.route('/:userId').post(addOrder);
 

@@ -3,19 +3,14 @@ import * as bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { createOrEmptyCartForUser } from "../service/cartService.js";
 import jsonwebtoken from "jsonwebtoken";
-export const getUserById = async (req, res) => {
-    try {
-        const userId = req.params.userId, user = await UserModel.findOne({ id: userId });
-        if (!user) {
-            return res.status(404).json({ error: 'User not found' });
-        }
-        return res.status(200).json(user);
-    }
-    catch (error) {
-        console.error('Error fetching user:', error);
-        res.status(404).json({ error: 'Error fetching user' });
-    }
-};
+/**
+ * The function is for registering a new user
+ * @param req : Request ,firstName:String, lastName:String, email:String, password:String, phoneNumber:String, gender:String,
+ * birthDate:String,address:String
+ * @param res: Response, User: Object
+ * @return {Object} User
+ * @throws {500} If there's an error while registering the user.
+ */
 export const register = async (req, res) => {
     try {
         const { firstName, lastName, email, password, phoneNumber, gender, birthDate, address } = req.body;
@@ -42,12 +37,21 @@ export const register = async (req, res) => {
         res.status(500).json({ error: 'Error registering user' });
     }
 };
+/**
+ * The function is for logging in a user, if the user is registered.
+ * @param req: Request, email:String, password:String
+ * @param res: Response, User: Object
+ * @return {Object} User
+ * @throws {500} If there's an error while logging in the user.
+ */
 export const login = async (req, res) => {
     try {
         const { email, password } = req.body;
         if (!(email && password))
             return res.status(404).json({ error: 'Missing fields' });
         const user = await UserModel.findOne({ email });
+        if (!user)
+            return res.status(404).json('User not found');
         if (user && (await bcrypt.compare(password, user.password))) {
             const token = jwt.sign({ email: email }, process.env.SECRET_CODE, {
                 expiresIn: "2h",
@@ -60,9 +64,17 @@ export const login = async (req, res) => {
     }
     catch (error) {
         console.error('Error logging in user:', error);
-        res.status(500).json({ error: 'Error logging in user' });
+        res.status(500).json('Error logging in user');
     }
 };
+/**
+ * The function logs out a user, if a user is authenticated.
+ * @param req: Request
+ * @param res: Response
+ * @return {Object} Message
+ * @throws {401} If the provided token is invalid.
+ * @throws {500} If there's an error while logging out the user.
+ */
 export const logout = async (req, res) => {
     var _a;
     try {
@@ -89,15 +101,3 @@ export const logout = async (req, res) => {
         }
     }
 };
-// export const protectedRoute = async (req: Request, res: Response) => {
-//     try {
-//         const token = req.headers.authorization?.split(' ')[1];
-//         if (!token) {
-//             return res.status(401).json({error: 'Invalid token'});
-//         }
-//         //const user = await verifyToken(token);
-//         //res.json({ message: `Welcome ${user.firstName}! This is a protected route.` });
-//     } catch (error:any) {
-//         res.status(401).json({ error: error.message });
-//     }
-// }

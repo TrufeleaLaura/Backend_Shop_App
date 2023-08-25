@@ -3,7 +3,7 @@ import ProductModel from "../model/product.js";
 
 
 /**
- * The function returns product from database
+ * The function returns product from by id database
  * @param req Request, productId: String
  * @param res: Response, Product: Object
  * @return {Object} Product

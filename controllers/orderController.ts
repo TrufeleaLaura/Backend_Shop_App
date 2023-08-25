@@ -14,12 +14,15 @@ import {createOrEmptyCartForUser} from "../service/cartService.js";
  */
 export const getOrderById = async (req: Request, res: Response) => {
     try {
-        const orderId = req.params.orderId,
+        const token = req.headers.authorization?.split(' ')[1],
+            userId = req.params.userId,
+            user = await verifyTokenAndRetrieveUser(token, userId),
+            orderId = req.params.orderId,
             order = await OrderModel.findById(orderId.trim());
         res.status(200).json(order);
     } catch (error: any) {
         if (error instanceof jsonwebtoken.JsonWebTokenError) {
-            res.status(401).json({error: 'Invalid token'});
+            res.status(401).json('Invalid token');
         } else {
             console.error('Error fetching order by userId:', error);
             res.status(400).json({error: error.message});
@@ -44,7 +47,7 @@ export const getOrdersByUserId = async (req: Request, res: Response) => {
         res.status(200).json(orders);
     } catch (error: any) {
         if (error instanceof jsonwebtoken.JsonWebTokenError) {
-            res.status(401).json({error: 'Invalid token'});
+            res.status(401).json('Invalid token');
         } else {
             console.error('Error fetching orders by userId:', error);
             res.status(400).json({error: error.message});
@@ -52,7 +55,7 @@ export const getOrdersByUserId = async (req: Request, res: Response) => {
     }
 }
 /**
- * The function adds a new order for a user, if the user is authenticated.
+ * The function adds a new order for a user and empties the user cart for a next future order if the user is authenticated.
  * @param req:Request, userId: String, phoneNumber: String, fullName: String, products: Array, total: Number, paymentMethod: String, address: String
  * @param res:Response, Cart: Object
  * @return {Object} Cart
@@ -82,7 +85,7 @@ export const addOrder = async (req: Request, res: Response) => {
         res.status(201).json(cart);
     } catch (error: any) {
         if (error instanceof jsonwebtoken.JsonWebTokenError) {
-            res.status(401).json({error: 'Invalid token'});
+            res.status(401).json('Invalid token');
         } else {
             console.error('Error adding order:', error);
             res.status(400).json({error: error.message});

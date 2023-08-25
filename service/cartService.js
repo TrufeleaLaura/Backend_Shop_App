@@ -1,4 +1,11 @@
 import CartModel from "../model/cart.js";
+/**
+ * The function create a cart for a user, if the user registered for the first time
+ * or returns the empty cart if the user already has one.
+ * @param userId: String
+ * @return {Object} Cart, null if there's an error, or {void} if the cart already exists.
+ * @throws {Error} If there's an error while creating the cart.
+ */
 export const createOrEmptyCartForUser = async (userId) => {
     try {
         const cartExists = await CartModel.findOne({ userId });
@@ -26,6 +33,13 @@ export const createOrEmptyCartForUser = async (userId) => {
         return null;
     }
 };
+/**
+ * The function updates the content of the cart  for a user, if the user is authenticated.
+ * @param cartItem: CartItem
+ * @param quantity: Number
+ * @param cart: Cart
+ * @return {void}
+ */
 export const modifyCartItem = (cartItem, quantity, cart) => {
     cartItem.quantity += quantity;
     cartItem.total = cartItem.quantity * cartItem.price;
@@ -33,6 +47,12 @@ export const modifyCartItem = (cartItem, quantity, cart) => {
     cart.totalQuantity = cart.totalQuantity + quantity;
     cart.total = cart.products.reduce((total, item) => total + item.discountedPrice, 0);
 };
+/**
+ * The function adds a new cart item to the cart for a user and update the cart content
+ * @param productToAddDoc: CartItem
+ * @param quantity: Number
+ * @param cart: Cart
+ */
 export const addNewCartItem = (productToAddDoc, quantity, cart) => {
     const newItem = {
         productId: productToAddDoc.get('id'),

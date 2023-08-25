@@ -26,7 +26,7 @@ export const getCartByUserId = async (req: Request, res: Response) => {
         res.status(200).json(cart);
     } catch (error: any) {
         if (error instanceof jsonwebtoken.JsonWebTokenError) {
-            res.status(401).json({error: 'Invalid token'});
+            res.status(401).json( 'Invalid token');
         } else {
             console.error('Error fetching cart by userId:', error);
             res.status(400).json({error: error.message});
@@ -36,7 +36,7 @@ export const getCartByUserId = async (req: Request, res: Response) => {
 
 
 /**
- * The function updates the content of the cart  for a user, if the user is authenticated.
+ * The function updates both the cart item of a cart and the cart, if the user is authenticated.
  * @param req: Request, userId: String, productId: String, quantity: Number
  * @param res:Response, Cart: Object
  * @return {Object} Cart
@@ -65,8 +65,12 @@ export const updateCartItem = async (req: Request, res: Response) => {
         await cart.save();
         res.status(200).json(cart);
     } catch (error: any) {
-        console.error('Error updating cart item:', error);
-        res.status(400).json({error: error.message});
+        if (error instanceof jsonwebtoken.JsonWebTokenError) {
+            res.status(401).json( 'Invalid token');
+        } else {
+            console.error('Error updating cart item:', error);
+            res.status(400).json({error: error.message});
+        }
     }
 }
 
@@ -99,8 +103,13 @@ export const deleteCartItem = async (req: Request, res: Response) => {
         await cart.save();
         return res.status(200).json(cart);
     } catch (error) {
-        console.error('Error deleting cart item:', error);
-        return res.status(500).json({error: 'Internal server error'});
+        if (error instanceof jsonwebtoken.JsonWebTokenError) {
+            res.status(401).json( 'Invalid token');
+        }
+        else {
+            console.error('Error deleting cart item:', error);
+            return res.status(500).json({error: 'Internal server error'});
+        }
     }
 
 }

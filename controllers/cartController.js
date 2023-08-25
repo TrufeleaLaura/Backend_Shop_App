@@ -3,6 +3,14 @@ import jsonwebtoken from "jsonwebtoken";
 import ProductModel from "../model/product.js";
 import { addNewCartItem, modifyCartItem } from "../service/cartService.js";
 import verifyTokenAndRetrieveUser from "../service/userService.js";
+/**
+ The function returns the content of the cart for a user, if the user is authenticated.
+ * @param req: Request, userId: String
+ * @param res: Response, Cart: Object
+ * @return {Object} Cart
+ *  * @throws {401} If the provided token is invalid.
+ *  * @throws {400} If there's an error while fetching the cart.
+ */
 export const getCartByUserId = async (req, res) => {
     var _a;
     try {
@@ -22,6 +30,13 @@ export const getCartByUserId = async (req, res) => {
         }
     }
 };
+/**
+ * The function updates both the cart item of a cart and the cart, if the user is authenticated.
+ * @param req: Request, userId: String, productId: String, quantity: Number
+ * @param res:Response, Cart: Object
+ * @return {Object} Cart
+ * * @throws {401} If the provided token is invalid.
+ */
 export const updateCartItem = async (req, res) => {
     var _a;
     try {
@@ -44,10 +59,22 @@ export const updateCartItem = async (req, res) => {
         res.status(200).json(cart);
     }
     catch (error) {
-        console.error('Error updating cart item:', error);
-        res.status(400).json({ error: error.message });
+        if (error instanceof jsonwebtoken.JsonWebTokenError) {
+            res.status(401).json({ error: 'Invalid token' });
+        }
+        else {
+            console.error('Error updating cart item:', error);
+            res.status(400).json({ error: error.message });
+        }
     }
 };
+/**
+ * The function deletes a cart item for a user and update the cart content, if the user is authenticated.
+ * @param req:Request, userId: String, productId: String
+ * @param res:Response, Cart: Object
+ * @return {Object} Cart
+ * * @throws {401} If the provided token is invalid.
+ */
 export const deleteCartItem = async (req, res) => {
     var _a;
     try {
@@ -67,7 +94,12 @@ export const deleteCartItem = async (req, res) => {
         return res.status(200).json(cart);
     }
     catch (error) {
-        console.error('Error deleting cart item:', error);
-        return res.status(500).json({ error: 'Internal server error' });
+        if (error instanceof jsonwebtoken.JsonWebTokenError) {
+            res.status(401).json({ error: 'Invalid token' });
+        }
+        else {
+            console.error('Error deleting cart item:', error);
+            return res.status(500).json({ error: 'Internal server error' });
+        }
     }
 };
