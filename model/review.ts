@@ -3,19 +3,19 @@ import mongoose, {Schema} from "mongoose";
 export interface Review{
     userId:string,
     productId:string,
-    starRating:number,
-    reviewTitle:string,
+    rating:number,
     reviewText:string,
-    date:Date,
+    date:String,
+    status:String
 }
 
 const reviewSchema = new Schema<Review>({
     userId: { type: String, required: true },
     productId: { type: String, required: true },
-    starRating: { type: Number, required: true },
-    reviewTitle: { type: String, required: true },
+    rating: { type: Number, required: true },
     reviewText: { type: String, required: true },
-    date: { type: Date, required: true },
+    date: { type: String, required: true },
+    status: { type: String, required: true },
 })
 
 const ReviewModel = mongoose.model<Review>('review', reviewSchema);
