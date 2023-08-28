@@ -3,7 +3,6 @@ import UserModel from "../model/user.js";
 import * as bcrypt from "bcrypt"
 import jwt from "jsonwebtoken";
 import {createOrEmptyCartForUser} from "../service/cartService.js";
-import verifyToken from "../service/userService.js";
 import jsonwebtoken from "jsonwebtoken";
 
 /**

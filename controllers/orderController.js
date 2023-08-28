@@ -13,8 +13,7 @@ import { createOrEmptyCartForUser } from "../service/cartService.js";
 export const getOrderById = async (req, res) => {
     var _a;
     try {
-        const token = (_a = req.headers.authorization) === null || _a === void 0 ? void 0 : _a.split(' ')[1], userId = req.params.userId, user = await verifyTokenAndRetrieveUser(token, userId);
-        const orderId = req.params.orderId, order = await OrderModel.findById(orderId.trim());
+        const token = (_a = req.headers.authorization) === null || _a === void 0 ? void 0 : _a.split(' ')[1], userId = req.params.userId, user = await verifyTokenAndRetrieveUser(token, userId), orderId = req.params.orderId, order = await OrderModel.findById(orderId.trim());
         res.status(200).json(order);
     }
     catch (error) {
@@ -43,7 +42,7 @@ export const getOrdersByUserId = async (req, res) => {
     }
     catch (error) {
         if (error instanceof jsonwebtoken.JsonWebTokenError) {
-            res.status(401).json({ error: 'Invalid token' });
+            res.status(401).json('Invalid token');
         }
         else {
             console.error('Error fetching orders by userId:', error);
@@ -76,13 +75,13 @@ export const addOrder = async (req, res) => {
         await OrderModel.create(newOrder);
         const cartToRefresh = await CartModel.findOne({ userId: userId.trim() });
         if (!cartToRefresh)
-            throw new Error('Cart not found');
+            return res.status(404).json({ error: 'Cart not found' });
         const cart = await createOrEmptyCartForUser(userId);
         res.status(201).json(cart);
     }
     catch (error) {
         if (error instanceof jsonwebtoken.JsonWebTokenError) {
-            res.status(401).json({ error: 'Invalid token' });
+            res.status(401).json('Invalid token');
         }
         else {
             console.error('Error adding order:', error);
@@ -90,3 +89,4 @@ export const addOrder = async (req, res) => {
         }
     }
 };
+//# sourceMappingURL=orderController.js.map

@@ -94,3 +94,4 @@ export const searchProducts = async (req, res) => {
     }
 };
 export default getProductById;
+//# sourceMappingURL=productController.js.map

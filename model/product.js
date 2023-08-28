@@ -15,3 +15,4 @@ const productSchema = new Schema({
 });
 const ProductModel = mongoose.model('product', productSchema);
 export default ProductModel;
+//# sourceMappingURL=product.js.map

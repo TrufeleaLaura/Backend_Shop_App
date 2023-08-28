@@ -69,3 +69,4 @@ export const addNewCartItem = (productToAddDoc, quantity, cart) => {
     cart.total = cart.total + newItem.discountedPrice;
     cart.products.push(newItem);
 };
+//# sourceMappingURL=cartService.js.map

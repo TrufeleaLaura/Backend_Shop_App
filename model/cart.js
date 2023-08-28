@@ -76,3 +76,4 @@ export default CartModel;
 //     "userId": 1,
 //     "totalProducts": 5,
 //     "totalQuantity": 10}]
+//# sourceMappingURL=cart.js.map

@@ -28,3 +28,4 @@ const verifyTokenAndRetrieveUser = async (token, userId) => {
     }
 };
 export default verifyTokenAndRetrieveUser;
+//# sourceMappingURL=userService.js.map
