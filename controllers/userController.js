@@ -82,7 +82,7 @@ export const logout = async (req, res) => {
         console.log(token);
         if (!token)
             return res.status(401).json({ error: 'Invalid token' });
-        const mysecretkey = "namaste", decoded = jwt.verify(token, mysecretkey), userEmail = decoded, user = await UserModel.findOne({ email: userEmail.email });
+        const mysecretkey = process.env.SECRET_CODE, decoded = jwt.verify(token, mysecretkey), userEmail = decoded, user = await UserModel.findOne({ email: userEmail.email });
         if (user) {
             const newToken = jwt.sign({ email: user.email }, process.env.SECRET_CODE, {
                 expiresIn: "5s",
@@ -93,7 +93,7 @@ export const logout = async (req, res) => {
     }
     catch (error) {
         if (error instanceof jsonwebtoken.JsonWebTokenError) {
-            res.status(401).json({ error: 'Invalid token' });
+            res.status(401).json('Invalid token');
         }
         else {
             console.error('Error logging out user:', error);
@@ -101,3 +101,4 @@ export const logout = async (req, res) => {
         }
     }
 };
+//# sourceMappingURL=userController.js.map

@@ -22,3 +22,4 @@ export default UserModel;
 //     "gender": "Female",
 //     "birthDate": "2023-08-08"
 // }]
+//# sourceMappingURL=user.js.map

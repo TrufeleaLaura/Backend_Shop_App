@@ -16,13 +16,13 @@ export const getCartByUserId = async (req, res) => {
     try {
         const token = (_a = req.headers.authorization) === null || _a === void 0 ? void 0 : _a.split(' ')[1], userId = req.params.userId, user = await verifyTokenAndRetrieveUser(token, userId), cart = await CartModel.findOne({ userId: user._id });
         if (!cart) {
-            throw new Error('Cart not found');
+            return res.status(404).json({ error: 'Cart not found' });
         }
         res.status(200).json(cart);
     }
     catch (error) {
         if (error instanceof jsonwebtoken.JsonWebTokenError) {
-            res.status(401).json({ error: 'Invalid token' });
+            res.status(401).json('Invalid token');
         }
         else {
             console.error('Error fetching cart by userId:', error);
@@ -42,7 +42,7 @@ export const updateCartItem = async (req, res) => {
     try {
         const token = (_a = req.headers.authorization) === null || _a === void 0 ? void 0 : _a.split(' ')[1], userId = req.params.userId, user = await verifyTokenAndRetrieveUser(token, userId), { productId, quantity } = req.body, cart = await CartModel.findOne({ userId: user._id });
         if (!cart) {
-            throw new Error('Cart not found');
+            return res.status(404).json({ error: 'Cart not found' });
         }
         const cartItem = cart.products.find(item => item.productId === productId);
         if (cartItem) {
@@ -60,7 +60,7 @@ export const updateCartItem = async (req, res) => {
     }
     catch (error) {
         if (error instanceof jsonwebtoken.JsonWebTokenError) {
-            res.status(401).json({ error: 'Invalid token' });
+            res.status(401).json('Invalid token');
         }
         else {
             console.error('Error updating cart item:', error);
@@ -80,7 +80,7 @@ export const deleteCartItem = async (req, res) => {
     try {
         const token = (_a = req.headers.authorization) === null || _a === void 0 ? void 0 : _a.split(' ')[1], userId = req.params.userId, user = await verifyTokenAndRetrieveUser(token, userId), productId = req.params.productId, cart = await CartModel.findOne({ userId: user._id });
         if (!cart) {
-            throw new Error('Cart not found');
+            return res.status(404).json({ error: 'Cart not found' });
         }
         const cartItem = cart === null || cart === void 0 ? void 0 : cart.products.find(item => item.productId === Number(productId));
         if (!cartItem) {
@@ -95,7 +95,7 @@ export const deleteCartItem = async (req, res) => {
     }
     catch (error) {
         if (error instanceof jsonwebtoken.JsonWebTokenError) {
-            res.status(401).json({ error: 'Invalid token' });
+            res.status(401).json('Invalid token');
         }
         else {
             console.error('Error deleting cart item:', error);
@@ -103,3 +103,4 @@ export const deleteCartItem = async (req, res) => {
         }
     }
 };
+//# sourceMappingURL=cartController.js.map

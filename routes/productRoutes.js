@@ -7,3 +7,4 @@ router.route('/categories').get(getAllCategories);
 router.route('/:productId').get(getProductById);
 router.route('/search/:searchTerm').get(searchProducts);
 export default router;
+//# sourceMappingURL=productRoutes.js.map
