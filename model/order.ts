@@ -1,4 +1,4 @@
-import {CartItem} from "./cart";
+import {CartItem} from "./cart.js";
 import mongoose, {Schema} from "mongoose";
 
 export interface Order{

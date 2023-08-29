@@ -60,7 +60,7 @@ export const login = async (req: Request, res: Response) => {
                 {email: email},
                 process.env.SECRET_CODE as string,
                 {
-                    expiresIn: "2h",
+                    expiresIn: "8h",
                 }
             );
             user.token = token;

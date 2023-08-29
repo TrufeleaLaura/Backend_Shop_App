@@ -54,7 +54,7 @@ export const login = async (req, res) => {
             return res.status(404).json('User not found');
         if (user && (await bcrypt.compare(password, user.password))) {
             const token = jwt.sign({ email: email }, process.env.SECRET_CODE, {
-                expiresIn: "2h",
+                expiresIn: "8h",
             });
             user.token = token;
             await user.save();

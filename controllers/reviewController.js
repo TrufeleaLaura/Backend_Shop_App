@@ -1,8 +1,7 @@
 import verifyTokenAndRetrieveUser from "../service/userService.js";
 import ProductModel from "../model/product.js";
 import ReviewModel from "../model/review.js";
-import OrderModel from "../model/order.js";
-import { serviceAddReview } from "../service/reviewService.js";
+import { createReview } from "../service/reviewService.js";
 /**
  * The function adds a new review for a product if the user is authenticated and has bought the product.
  * @param req Request, productId: String, userId: String, reviewText: String, reviewTitle: String, rating: Number
@@ -13,8 +12,8 @@ import { serviceAddReview } from "../service/reviewService.js";
 export const addReview = async (req, res) => {
     var _a;
     try {
-        const { productId, userId, reviewText, reviewTitle, rating: rating } = req.body, token = (_a = req.headers.authorization) === null || _a === void 0 ? void 0 : _a.split(' ')[1];
-        if (!(productId && userId && reviewText && reviewTitle && rating))
+        const { reviewText, rating: rating } = req.body, token = (_a = req.headers.authorization) === null || _a === void 0 ? void 0 : _a.split(' ')[1], productId = req.params.productId, userId = req.params.userId;
+        if (!(productId && userId && reviewText && rating))
             return res.status(404).json({ error: 'Missing fields' });
         const user = await verifyTokenAndRetrieveUser(token, userId), product = await ProductModel.findOne({ id: productId });
         if (!product) {
@@ -23,27 +22,12 @@ export const addReview = async (req, res) => {
         if (!user) {
             return res.status(404).json({ error: 'User not found' });
         }
-        const orders = await OrderModel.find({ userId: userId.trim() });
-        let ownsProduct = orders.some(order => {
-            return order.products.some(product => {
-                if (product.productId === productId) {
-                    return true;
-                }
-            });
-        });
-        if (!ownsProduct) {
-            res.status(404).json({ error: 'You cannot review a product you have not bought' });
-            return;
-        }
-        const foundReview = await ReviewModel.findOne({ userId, productId: productId });
-        if (foundReview)
-            return res.status(400).json({ error: 'You have already reviewed this product' });
-        const newReview = await serviceAddReview(userId, productId, rating, reviewText);
-        res.status(200).json(newReview);
+        const newReview = await createReview(userId, Number(productId), rating, reviewText);
+        const reviewsForProduct = await ReviewModel.find({ productId: productId });
+        res.status(200).json(reviewsForProduct);
     }
     catch (error) {
-        console.error('Error adding review:', error);
-        res.status(400).json({ error: 'Error adding review' });
+        res.status(400).json(error.message);
     }
 };
 /**
@@ -69,11 +53,11 @@ export const deleteReview = async (req, res) => {
         if (userId !== reviewToDelete.userId)
             return res.status(400).json({ error: 'You cannot delete a review that is not yours' });
         await ReviewModel.deleteOne({ _id: reviewId });
-        res.status(200).json({ message: 'Review deleted successfully' });
+        const reviewsForProduct = await ReviewModel.find({ productId: reviewToDelete.productId });
+        res.status(200).json(reviewsForProduct);
     }
     catch (error) {
-        console.error('Error deleting review:', error);
-        res.status(400).json({ error: 'Error deleting review' });
+        res.status(400).json(error.message);
     }
 };
 /**
@@ -92,7 +76,6 @@ export const getReviewsOfProduct = async (req, res) => {
         res.status(200).json(reviews);
     }
     catch (error) {
-        console.error('Error fetching reviews:', error);
         res.status(400).json({ error: 'Error fetching reviews' });
     }
 };
@@ -101,25 +84,31 @@ export const updateReview = async (req, res) => {
     try {
         const userId = req.params.userId, reviewId = req.params.reviewId, token = (_a = req.headers.authorization) === null || _a === void 0 ? void 0 : _a.split(' ')[1], { reviewText, rating } = req.body;
         if (!(userId && reviewId && reviewText && rating)) {
-            return res.status(400).json({ error: 'Missing fields' });
+            return res.status(400).json('Missing fields');
+        }
+        if (rating < 1 || rating > 5) {
+            return res.status(400).json('Rating must be between 1 and 5');
         }
         const user = await verifyTokenAndRetrieveUser(token, userId);
         if (!user) {
-            return res.status(404).json({ error: 'User not found' });
+            return res.status(404).json('User not found');
         }
         const reviewToUpdate = await ReviewModel.findOne({ _id: reviewId });
         if (!reviewToUpdate) {
-            return res.status(404).json({ error: 'Review not found' });
+            return res.status(404).json('Review not found');
         }
         if (userId !== reviewToUpdate.userId) {
             return res.status(400).json({ error: 'You cannot update a review that is not yours' });
         }
-        await ReviewModel.findOneAndUpdate({ _id: reviewId }, { reviewText: reviewText, rating: rating, status: "updated" });
-        const updatedReview = await ReviewModel.findOne({ _id: reviewId });
-        res.status(200).json(updatedReview);
+        await ReviewModel.findOneAndUpdate({ _id: reviewId }, {
+            reviewText: reviewText,
+            rating: rating,
+            status: "Updated"
+        });
+        const reviewsForProduct = await ReviewModel.find({ productId: reviewToUpdate.productId });
+        res.status(200).json(reviewsForProduct);
     }
     catch (error) {
-        console.error('Error updating review:', error);
         res.status(400).json({ error: 'Error updating review' });
     }
 };

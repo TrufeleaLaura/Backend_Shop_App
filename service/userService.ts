@@ -11,7 +11,6 @@ import CartModel from "../model/cart.js";
  */
 const verifyTokenAndRetrieveUser = async (token: any, userId: string) => {
     try {
-        console.log('token', token)
         if (!token) {
             throw new Error('Invalid token');
         }
@@ -29,7 +28,6 @@ const verifyTokenAndRetrieveUser = async (token: any, userId: string) => {
         return user;
     } catch (error: any) {
         throw error;
-
     }
 };
 

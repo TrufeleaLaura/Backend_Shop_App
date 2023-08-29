@@ -1,13 +1,33 @@
 import ReviewModel from "../model/review.js";
-export const serviceAddReview = async (userId, productId, rating, reviewText) => {
-    const currentDate = new Date().toLocaleString(), newReview = await ReviewModel.create({
-        userId,
-        productId,
-        rating,
-        reviewText,
-        date: currentDate,
-        status: 'new'
-    });
-    return await newReview.save();
+import OrderModel from "../model/order.js";
+export const createReview = async (userId, productId, rating, reviewText) => {
+    try {
+        const orders = await OrderModel.find({ userId: userId.trim() });
+        let ownsProduct = orders.some(order => {
+            return order.products.some(product => {
+                if (product.productId === productId) {
+                    return true;
+                }
+            });
+        });
+        if (!ownsProduct) {
+            throw new Error('You have not bought this product');
+        }
+        const foundReview = await ReviewModel.findOne({ userId, productId: productId });
+        if (foundReview)
+            throw new Error('You have already reviewed this product');
+        const newReview = await ReviewModel.create({
+            userId,
+            productId,
+            rating,
+            reviewText,
+            date: new Date().toISOString().split('T')[0].toString(),
+            status: 'New'
+        });
+        return newReview;
+    }
+    catch (error) {
+        throw error;
+    }
 };
 //# sourceMappingURL=reviewService.js.map

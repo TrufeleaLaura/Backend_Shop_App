@@ -2,7 +2,7 @@ import mongoose, {Schema} from "mongoose";
 
 export interface Review{
     userId:string,
-    productId:string,
+    productId:number,
     rating:number,
     reviewText:string,
     date:String,
@@ -11,7 +11,7 @@ export interface Review{
 
 const reviewSchema = new Schema<Review>({
     userId: { type: String, required: true },
-    productId: { type: String, required: true },
+    productId: { type: Number, required: true },
     rating: { type: Number, required: true },
     reviewText: { type: String, required: true },
     date: { type: String, required: true },

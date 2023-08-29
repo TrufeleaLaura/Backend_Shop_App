@@ -16,7 +16,7 @@ app.use("/api/products/", productsRoutes);
 app.use("/api/cart/", cartRoutes);
 app.use("/api/user/", userRoutes);
 app.use("/api/order/", orderRoutes);
-app.use("/api/reviews", reviewRoutes);
+app.use("/api/review/", reviewRoutes);
 const PORT = process.env.PORT || 8080;
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);

@@ -9,7 +9,6 @@ import UserModel from "../model/user.js";
  */
 const verifyTokenAndRetrieveUser = async (token, userId) => {
     try {
-        console.log('token', token);
         if (!token) {
             throw new Error('Invalid token');
         }
