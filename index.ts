@@ -8,6 +8,7 @@ import orderRoutes from "./routes/orderRoutes.js";
 import cors from "cors";
 import dotenv from "dotenv";
 import reviewRoutes from "./routes/reviewRoutes.js";
+import returnRoutes from "./routes/returnRoutes.js";
 
 dotenv.config();
 
@@ -21,8 +22,12 @@ app.use("/api/cart/",cartRoutes);
 app.use("/api/user/",userRoutes);
 app.use("/api/order/",orderRoutes);
 app.use("/api/review/",reviewRoutes);
+app.use("/api/return/",returnRoutes);
 
 const PORT = process.env.PORT || 8080;
+
+
+
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
 });

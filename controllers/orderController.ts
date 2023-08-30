@@ -67,11 +67,14 @@ export const addOrder = async (req: Request, res: Response) => {
         const token = req.headers.authorization?.split(' ')[1],
             userId = req.params.userId,
             user = await verifyTokenAndRetrieveUser(token, req.params.userId),
+            products = req.body.products.forEach((product: any) => {
+                product.status = 'Buyed';
+            }),
             newOrder: Order = {
                 userId: userId.trim(),
                 phoneNumber: req.body.phoneNumber,
                 fullName: req.body.fullName,
-                products: req.body.products,
+                products: products,
                 total: req.body.total,
                 paymentMethod: req.body.paymentMethod,
                 address: req.body.address,
@@ -91,6 +94,22 @@ export const addOrder = async (req: Request, res: Response) => {
             console.error('Error adding order:', error);
             res.status(400).json({error: error.message});
         }
+    }
+}
+
+export const setStatusToOrder = async (req: Request, res: Response) => {
+    const newStatus = "Purchased";
+    try {
+        const orders = await OrderModel.find();
+        for (const order of orders) {
+            for (const product of order.products) {
+                product.status = newStatus;
+            }
+            await order.save();
+        }
+        console.log('Status updated successfully');
+    } catch (error) {
+        console.error('Error updating status:', error);
     }
 }
 

@@ -1,11 +1,23 @@
 import {CartItem} from "./cart.js";
 import mongoose, {Schema} from "mongoose";
 
+export interface OrderItem{
+    productId: number;
+    quantity: number;
+    total: number;
+    price:number;
+    title:string;
+    thumbnail:string;
+    discountPercentage:number;
+    discountedPrice:number;
+    status:string;
+}
+
 export interface Order{
     userId:string,
     total:number,
     paymentMethod:string,
-    products:CartItem[],
+    products:OrderItem[],
     address:string,
     date:string,
     deliveryStatus:string,
@@ -31,6 +43,7 @@ const  orderSchema = new Schema<Order>({
         price: { type: Number, required: true },
         discountPercentage: {type:Number,required:true},
         discountedPrice: {type:Number,required:true},
+        status: {type:String,required:true},
     }],
 
     });

@@ -17,6 +17,7 @@ const orderSchema = new Schema({
             price: { type: Number, required: true },
             discountPercentage: { type: Number, required: true },
             discountedPrice: { type: Number, required: true },
+            status: { type: String, required: true },
         }],
 });
 const OrderModel = mongoose.model('order', orderSchema);

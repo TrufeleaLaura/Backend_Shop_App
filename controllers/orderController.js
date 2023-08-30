@@ -61,11 +61,13 @@ export const getOrdersByUserId = async (req, res) => {
 export const addOrder = async (req, res) => {
     var _a;
     try {
-        const token = (_a = req.headers.authorization) === null || _a === void 0 ? void 0 : _a.split(' ')[1], userId = req.params.userId, user = await verifyTokenAndRetrieveUser(token, req.params.userId), newOrder = {
+        const token = (_a = req.headers.authorization) === null || _a === void 0 ? void 0 : _a.split(' ')[1], userId = req.params.userId, user = await verifyTokenAndRetrieveUser(token, req.params.userId), products = req.body.products.forEach((product) => {
+            product.status = 'Buyed';
+        }), newOrder = {
             userId: userId.trim(),
             phoneNumber: req.body.phoneNumber,
             fullName: req.body.fullName,
-            products: req.body.products,
+            products: products,
             total: req.body.total,
             paymentMethod: req.body.paymentMethod,
             address: req.body.address,
@@ -87,6 +89,22 @@ export const addOrder = async (req, res) => {
             console.error('Error adding order:', error);
             res.status(400).json({ error: error.message });
         }
+    }
+};
+export const setStatusToOrder = async (req, res) => {
+    const newStatus = "Purchased";
+    try {
+        const orders = await OrderModel.find();
+        for (const order of orders) {
+            for (const product of order.products) {
+                product.status = newStatus;
+            }
+            await order.save();
+        }
+        console.log('Status updated successfully');
+    }
+    catch (error) {
+        console.error('Error updating status:', error);
     }
 };
 //# sourceMappingURL=orderController.js.map
