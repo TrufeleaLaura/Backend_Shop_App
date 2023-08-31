@@ -3,7 +3,8 @@ import express from "express";
 
 const router=express.Router();
 
-router.route('/:userId/:orderId').post(addReturn);
+//these routes are not ok, need to be fixed
+router.route('/add-return/:userId/:orderId').post(addReturn);
 router.route('/:userId').get(getAllReturnsForUser);
 
 export default router;

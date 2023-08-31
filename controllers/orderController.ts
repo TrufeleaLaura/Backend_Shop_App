@@ -113,3 +113,22 @@ export const setStatusToOrder = async (req: Request, res: Response) => {
     }
 }
 
+export const getPurchasedProductsByOrderId = async (req: Request, res: Response) => {
+    try{
+        //console.log(req);
+        const token = req.headers.authorization?.split(' ')[1],
+            userId = req.body.userId,
+            user = await verifyTokenAndRetrieveUser(token, userId),
+            orderId = req.body.orderId,
+            order = await OrderModel.findById(orderId.trim());
+        if (!order || order.userId !== userId) {
+            return res.status(404).json({error: 'Order not found'});
+        }
+        const purchasedProducts = order.products.filter(product => product.status === 'Purchased');
+        res.status(200).json(purchasedProducts);
+    }
+    catch (error: any) {
+        res.status(400).json(error.message);
+    }
+}
+

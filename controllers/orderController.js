@@ -107,4 +107,19 @@ export const setStatusToOrder = async (req, res) => {
         console.error('Error updating status:', error);
     }
 };
+export const getPurchasedProductsByOrderId = async (req, res) => {
+    var _a;
+    try {
+        //console.log(req);
+        const token = (_a = req.headers.authorization) === null || _a === void 0 ? void 0 : _a.split(' ')[1], userId = req.body.userId, user = await verifyTokenAndRetrieveUser(token, userId), orderId = req.body.orderId, order = await OrderModel.findById(orderId.trim());
+        if (!order || order.userId !== userId) {
+            return res.status(404).json({ error: 'Order not found' });
+        }
+        const purchasedProducts = order.products.filter(product => product.status === 'Purchased');
+        res.status(200).json(purchasedProducts);
+    }
+    catch (error) {
+        res.status(400).json(error.message);
+    }
+};
 //# sourceMappingURL=orderController.js.map
